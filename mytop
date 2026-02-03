@@ -586,7 +586,7 @@ while (1) {
         }
         Clear();
         print "Error is: $data->{Last_Error}\n" if $data;
-        print RED(), "-- paused. press any key to resume --", RESET();
+        print RED(), "-- PAUSED - Press any key to resume --", RESET();
         ReadKey(0);
         next;
     }
@@ -605,7 +605,7 @@ while (1) {
     ## p - pause
 
     if ( $key eq 'p' ) {
-        print RED(), "-- paused. press any key to resume --", RESET();
+        print RED(), "-- PAUSED - Press any key to resume --", RESET();
         ReadKey(0);
         next;
     }
@@ -715,13 +715,13 @@ while (1) {
         chomp $id;
         FullQueryInfo($id);
         ReadMode($RM_NOBLKRD);
-        print RED(), "-- paused. press any key to resume or (e) to explain --",
+        print RED(), "-- PAUSED - Press any key to resume or (e) to explain --",
           RESET();
         my $key = ReadKey(0);
 
         if ( $key eq 'e' ) {
             Explain($id);
-            print RED(), "-- paused. press any key to resume --", RESET();
+            print RED(), "-- PAUSED - Press any key to resume --", RESET();
             ReadKey(0);
         }
 
@@ -737,7 +737,7 @@ while (1) {
         chomp $id;
         Explain($id);
         ReadMode($RM_NOBLKRD);
-        print RED(), "-- paused. press any key to resume --", RESET();
+        print RED(), "-- PAUSED - Press any key to resume --", RESET();
         ReadKey(0);
         next;
     }
@@ -770,7 +770,7 @@ while (1) {
 
     if ( $key eq 'V' ) {
         GetShowVariables();
-        print RED(), "-- paused. press any key to resume --", RESET();
+        print RED(), "-- PAUSED - Press any key to resume --", RESET();
         ReadKey(0);
     }
 
@@ -1302,6 +1302,9 @@ sub GetData() {
         last if $lines_left == 0;
 
     }
+
+    ## Add blank line after thread list for better spacing with interactive commands
+    print "\n";
 
 }
 
