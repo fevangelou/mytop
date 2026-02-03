@@ -1,16 +1,26 @@
 # mytop
 
-A powerful MySQL and MariaDB monitoring tool for the command line, displaying real-time server performance information similar to the Unix `top` command.
+A powerful MySQL and MariaDB monitoring tool for the command line, displaying real-time database server performance information similar to `top`.
 
-## About This Version
 
-**mytop v2.0** includes comprehensive compatibility patches for MySQL 8.0+ and modern MariaDB versions.
+## About
 
----
+This is a fork of the original mytop Perl script, updated for MySQL 8.x & MariaDB 10.3+ (or newer) releases.
 
-## What's New in v2.0
+It is not a half-baked todo-when-I-get-the-time fork.
 
-### MySQL 8.0 & MariaDB 10.3 oe newer Compatibility Fixes
+As a day & night sysadmin, I use mytop daily. My gradual switch to Ubuntu Server 24.04 however left me with Innotop, which simply does not work right (especially when it comes to explaining queries). As such, forking mytop was the only sensible thing to do. And as long as I'm active as a sysadmin (17+ years already), I'll keep it updated.
+
+Yes, it has been "vibe coded" with the help of Anthropic's Claude (Perl was never my domain), but I have tested it extensively and since it's a daily tool for me, I'm gonna keep on maintaining it, as well as examine a possible rewrite to amother language.
+
+Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it for MySQL 5.x).
+
+P.S. Whoever said AI is killing open source is wrong. Needs and ways have just shifted. Embrace the new tooling.
+
+
+## What's New
+
+### MySQL 8.0 & MariaDB 10.3 (or newer) compatibility fixes
 
 #### Query Cache Removal
 - MySQL 8.0 completely removed the query cache feature
@@ -86,8 +96,8 @@ wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop
 # Make it executable
 chmod +x /usr/local/sbin/mytop
 
-# Or run directly from the current directory
-./mytop [options]
+# Run
+mytop
 
 ```
 
