@@ -1,10 +1,10 @@
 # mytop
 
-A powerful MySQL and MariaDB monitoring tool for the command line, displaying real-time database server performance information similar to `top`.
+A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** displays real-time database server performance information similar to `top`.
 
 
 ## Current Version
-v2.0 - released on Feb 3rd, 2026
+**v2.0** - released on Feb 3rd, 2026
 
 
 ## About
@@ -13,13 +13,13 @@ This is a fork of the original mytop Perl script, updated for MySQL 8.x & MariaD
 
 It is not a half-baked todo-when-I-get-the-time fork.
 
-As a day & night sysadmin, I use mytop daily. My gradual switch to Ubuntu Server 24.04 however left me with Innotop, which simply does not work right (especially when it comes to explaining queries - plus it never "clicked" as you had to configure it for basic usage). As such, forking mytop was the only sensible thing to do. And as long as I'm active as a sysadmin (17+ years already), I'll keep it updated.
+As a day & night sysadmin, I use mytop... daily. Or at least, I did. My gradual switch to Ubuntu Server 24.04 left me with Innotop, which simply does not work right (especially when it comes to explaining queries - plus it never "clicked" as you had to configure it just for the basics you get from mytop out of the box - go figure). As such, forking mytop was the only sensible thing to do. And as long as I'm active as a sysadmin (17+ years already), I'll keep it updated.
 
 Yes, it has been "vibe coded" with the help of Anthropic's Claude (Perl was never my domain), but I have tested it extensively and since it's a daily tool for me, I'm gonna keep on maintaining it, as well as examine a possible rewrite to amother language.
 
 Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it for MySQL 5.x).
 
-P.S. Whoever said AI is killing open source is wrong. Needs and ways have just shifted. Embrace the new tooling.
+*P.S. Whoever said AI is killing open source is wrong. Needs and ways have just shifted. Embrace the new tooling.*
 
 
 ## What's New
