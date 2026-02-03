@@ -73,22 +73,26 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 
 mytop requires the following Perl modules:
 
-#### On Ubuntu 22.04+ / Debian 12+
+#### On Ubuntu 22.04+ / Debian 11+
 ```bash
 sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl
 ```
 
-#### On RHEL / CentOS / Fedora
+#### On RHEL distros (v7 or newer)
 ```bash
 sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey
 ```
+or
+```bash
+sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey
+```
 
-#### Via CPAN
+#### Via CPAN (for the purists)
 ```bash
 cpan DBI DBD::mysql Term::ReadKey
 ```
 
-### Simple Installation (Recommended)
+### One-line installation
 
 No need to run `make` and `make install` as with previous versions - mytop is a standalone Perl script:
 
@@ -99,8 +103,6 @@ wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop
 
 # Just run (the defaults work just fine for recent Ubuntu and Debian releases)
 mytop
-
-```
 
 ---
 
@@ -213,9 +215,9 @@ mytop --user root --password secret --host localhost --db mysql
 | Operating System | Status |
 |-----------------|--------|
 | Linux | ✅ Full support |
-| macOS | ✅ Full support |
 | Other Unix | ✅ Full support (no load average) |
-| Windows | ⚠️ Limited support |
+| macOS | ✅ Full support |
+| Windows | ⚠️ Seriously? |
 
 ---
 
