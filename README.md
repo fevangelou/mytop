@@ -86,7 +86,7 @@ cpan DBI DBD::mysql Term::ReadKey
 
 ### Simple Installation (Recommended)
 
-No need to run `make` or `make install` 9/as with previous versions) - mytop is a standalone Perl script:
+No need to run `make` and `make install` as with previous versions - mytop is a standalone Perl script:
 
 ```bash
 
