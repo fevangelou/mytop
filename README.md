@@ -19,7 +19,7 @@ mytop
 
 ---
 
-## About
+## ABOUT
 
 This is a fork of the original mytop Perl script, updated for MySQL 8.x & MariaDB 10.3+ (or newer) releases.
 
@@ -34,7 +34,7 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 *P.S. Whoever said AI is killing open source is wrong. Needs and ways have just shifted. Embrace the new tooling.*
 
 
-## What's New
+## WHAT'S NEW
 
 ### MySQL 8.0 & MariaDB 10.3 (or newer) compatibility fixes
 
@@ -79,7 +79,7 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 
 ---
 
-## Installation
+## INSTALLATION INSTRUCTIONS
 
 ### Prerequisites
 
@@ -121,9 +121,9 @@ mytop
 
 ---
 
-## Configuration
+## CONFIGURATION
 
-### Config File
+### The .mytop Configuration File
 
 When run as a root user, the defaults should work out of the box. Should you need to adjust them or allow regular system users to access mytop, create a config file at `~/.mytop` (either for root or for each user you want to allow using mytop) with your connection settings:
 
@@ -218,7 +218,7 @@ mytop --user root --password secret --host localhost --db mysql
 
 ---
 
-## Compatibility Matrix
+## COMPATIBILITY MATRIX
 
 | Database Version | Status |
 |-----------------|--------|
@@ -236,7 +236,7 @@ mytop --user root --password secret --host localhost --db mysql
 
 ---
 
-## Usage
+## USAGE
 
 ### Basic Usage
 
@@ -256,9 +256,9 @@ mytop --batch
 
 ---
 
-## Changelog
+## CHANGELOG
 
-* This changelog provides a historical record of all previous versions.
+*This changelog provides a historical record of all previous versions.*
 
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
@@ -281,7 +281,7 @@ This version is fully compatible with:
 - MySQL 5.x (with query cache)
 - MySQL 8.0+ (without query cache)
 - MariaDB 10.3+
-- Systems without /proc filesystem
+- On Debian 11+, Ubuntu 22.04+ and RHEL distros v7+
 
 Version 2.0 was based off v1.91 from Mark Grennan.
 
