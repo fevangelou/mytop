@@ -152,11 +152,11 @@ Once mytop is running, use these keys:
 - `#` - Display only threads from a specific database
 - `c` - Toggle color on/off
 - `d` - Show only specific database
-- `e` - Explain the query under cursor
+- `e` - Explain a query
 - `f` - Filter display by query text
-- `F` - Disable filters
-- `h` - Reset to header display
-- `i` - Toggle idle process display
+- `F` - Remove all filters
+- `h` - Toggle header display
+- `i` - Toggle idle thread display
 - `I` - Toggle full idle command display
 - `k` - Kill a specific thread
 - `l` - Display full queries (toggle long)
