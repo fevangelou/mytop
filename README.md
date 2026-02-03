@@ -86,7 +86,7 @@ No need to run `make` or `make install` 9/as with previous versions) - mytop is 
 ```bash
 
 # Download
-wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/master/mytop
+wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop
 
 # Make it executable
 chmod +x /usr/local/sbin/mytop
