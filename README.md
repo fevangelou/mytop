@@ -223,32 +223,12 @@ mytop --db information_schema
 
 # Batch mode (non-interactive)
 mytop --batch
-```
-
-### Interactive Commands
-
-While mytop is running, press:
-
-- `?` - Display help
-- `d` - Show only a specific database
-- `e` - Explain a query
-- `f` - Filter by user, host, database, or state
-- `F` - Remove all filters
-- `h` - Toggle header display
-- `i` - Toggle idle thread display
-- `k` - Kill a thread
-- `p` - Pause display
-- `q` - Quit
-- `r` - Reverse sort order
-- `s` - Change refresh delay
-- `u` - Show only a specific user
-- `C` - Toggle color mode
-- `S` - Set slow query highlighting threshold
-- `l` - Set long query highlighting threshold
 
 ---
 
 ## Changelog
+
+* This changelog provides a historical record of all previous versions.
 
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
@@ -272,6 +252,8 @@ This version is fully compatible with:
 - MySQL 8.0+ (without query cache)
 - MariaDB 10.3+
 - Systems without /proc filesystem
+
+Version 2.0 was based off v1.91 from Mark Grennan.
 
 ### Version 1.9.1 - February 14, 2012 (Mark Grennan)
 - Added display of system load level on the top line
