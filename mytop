@@ -312,6 +312,8 @@ ReadMode($RM_RESET) unless $config{batchmode};
 
 my $db_version;
 my $db_release;
+my $is_mariadb = 0;
+my $mariadb_version;
 my $have_query_cache;
 
 my @variables = Hashes("show variables");
@@ -319,7 +321,21 @@ my @variables = Hashes("show variables");
 foreach (@variables) {
     if ( $_->{Variable_name} eq "version" ) {
         $db_version = $_->{Value};
-        $db_release = int( sprintf( "%d", $db_version ) );
+
+        # Detect MariaDB vs MySQL
+        if ( $db_version =~ /mariadb/i ) {
+            $is_mariadb = 1;
+
+            # Extract MariaDB version (e.g., "10.3.39-MariaDB" -> 10.3)
+            if ( $db_version =~ /^(\d+)\.(\d+)/ ) {
+                $mariadb_version = "$1.$2";
+                $db_release      = $1;        # Major version
+            }
+        }
+        else {
+            # MySQL version
+            $db_release = int( sprintf( "%d", $db_version ) );
+        }
         next;
     }
     if ( $_->{Variable_name} eq "have_query_cache" ) {
@@ -336,21 +352,35 @@ foreach (@variables) {
     }
 }
 
-## MySQL 8.0+ removed query cache entirely, so check for its existence
-## by looking for Qcache_hits in status variables
+## MySQL 8.0+ and MariaDB 10.6+ removed query cache entirely,
+## so check for its existence by looking for Qcache_hits in status variables
 if ( !defined $have_query_cache ) {
 
-    # Query cache variable doesn't exist, check if we're on MySQL 8+
-    # where query cache was removed
-    if ( $db_release >= 8 ) {
-        $have_query_cache = 0;
+    # Query cache variable doesn't exist, check if it was removed
+    if ($is_mariadb) {
+
+        # MariaDB 10.6+ removed query cache
+        if ( $mariadb_version && $mariadb_version >= 10.6 ) {
+            $have_query_cache = 0;
+        }
+        else {
+            # MariaDB 10.5 and earlier may have query cache
+            my @qcache_check = Hashes("SHOW STATUS LIKE 'Qcache_hits'");
+            $have_query_cache =
+              ( @qcache_check && $qcache_check[0]->{Value} ne '' ) ? 1 : 0;
+        }
     }
     else {
-        # For older versions without the variable, try to detect query cache
-        # by checking if Qcache_hits exists in status
-        my @qcache_check = Hashes("SHOW STATUS LIKE 'Qcache_hits'");
-        $have_query_cache =
-          ( @qcache_check && $qcache_check[0]->{Value} ne '' ) ? 1 : 0;
+        # MySQL 8.0+ removed query cache
+        if ( $db_release >= 8 ) {
+            $have_query_cache = 0;
+        }
+        else {
+            # For MySQL 5.x, try to detect query cache
+            my @qcache_check = Hashes("SHOW STATUS LIKE 'Qcache_hits'");
+            $have_query_cache =
+              ( @qcache_check && $qcache_check[0]->{Value} ne '' ) ? 1 : 0;
+        }
     }
 }
 
@@ -409,9 +439,22 @@ while (1) {
     ##
 
     if ( $key eq '!' ) {
-        Execute("stop slave");
-        Execute("set global sql_slave_skip_counter=1");
-        Execute("start slave");
+
+        # Try modern REPLICA syntax first (MariaDB 10.5+, MySQL 8.0.22+),
+        # fall back to SLAVE syntax for older versions
+        my $stop_result = Execute("STOP REPLICA");
+        if ( !$stop_result ) {
+            Execute("STOP SLAVE");
+        }
+
+        Execute("SET GLOBAL sql_slave_skip_counter=1");
+
+        if ($stop_result) {
+            Execute("START REPLICA");
+        }
+        else {
+            Execute("START SLAVE");
+        }
     }
 
     # t - top
@@ -535,9 +578,14 @@ while (1) {
     ## E - Show full Replication Error
 
     if ( $key eq 'E' ) {
-        my ($data) = Hashes('SHOW SLAVE STATUS');
+
+        # Try REPLICA first (modern syntax), fall back to SLAVE
+        my ($data) = Hashes('SHOW REPLICA STATUS');
+        if ( !$data || !exists $data->{Last_Error} ) {
+            ($data) = Hashes('SHOW SLAVE STATUS');
+        }
         Clear();
-        print "Error is: $data->{Last_Error}\n";
+        print "Error is: $data->{Last_Error}\n" if $data;
         print RED(), "-- paused. press any key to resume --", RESET();
         ReadKey(0);
         next;
@@ -1052,8 +1100,13 @@ sub GetData() {
             print RESET() if ($HAS_COLOR);
         }
 
-        my ($slave_data) = Hashes('SHOW SLAVE STATUS');
-        if ( defined( $slave_data->{Master_Host} ) ) {
+        # Try REPLICA first (modern syntax), fall back to SLAVE
+        my ($slave_data) = Hashes('SHOW REPLICA STATUS');
+        if ( !$slave_data || !exists $slave_data->{Master_Host} ) {
+            ($slave_data) = Hashes('SHOW SLAVE STATUS');
+        }
+
+        if ( $slave_data && defined( $slave_data->{Master_Host} ) ) {
             if ( defined( $slave_data->{Seconds_Behind_Master} ) ) {
                 if ($HAS_COLOR) {
                     print GREEN();
@@ -1285,12 +1338,35 @@ sub GetInnoDBStatus() {
         }
     }
 
-    my @data = Hashes("SHOW INNODB STATUS");
+    # Use modern syntax (MySQL 5.0+, MariaDB 10.x+)
+    # Falls back to old syntax if needed
+    my @data;
+    eval { @data = Hashes("SHOW ENGINE INNODB STATUS"); };
 
-    open P, "|$config{pager}" or die "$!";
-    print keys %{ $data[0] };
-    print $data[0]->{Status}, "\n";
-    close P;
+    if ( $@ || !@data ) {
+
+        # Fallback to old syntax for very old versions
+        @data = Hashes("SHOW INNODB STATUS");
+    }
+
+    if ( @data && $data[0] ) {
+        open P, "|$config{pager}" or die "$!";
+
+# Handle both old format (Status column) and new format (Type, Name, Status columns)
+        if ( exists $data[0]->{Status} ) {
+            print P $data[0]->{Status}, "\n";
+        }
+        elsif ( exists $data[0]->{Type} ) {
+
+            # New format has Type, Name, Status columns
+            for my $row (@data) {
+                print P "Type: $row->{Type}\n" if $row->{Type};
+                print P "Name: $row->{Name}\n" if $row->{Name};
+                print P $row->{Status}, "\n" if $row->{Status};
+            }
+        }
+        close P;
+    }
 }
 
 ###########################################################################
