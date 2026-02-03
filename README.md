@@ -112,7 +112,7 @@ mytop
 
 When run as a root user, the defaults should work out of the box. Should you need to adjust them or allow regular system users to access mytop, create a config file at `~/.mytop` (either for root or for each user you want to allow using mytop) with your connection settings:
 
-```
+```bash
 # Place at ~/.mytop - adjust as needed
 host=localhost
 port=3306
