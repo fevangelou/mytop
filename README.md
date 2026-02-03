@@ -9,11 +9,14 @@ A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** dis
 ---
 
 ## I know mytop - just show me how to install it
-```bash
-# 1. Download & make executable
-wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
 
-# 2. Just run (the defaults work just fine for recent Ubuntu & Debian releases)
+1. Download into /usr/local/sbin & make executable
+```bash
+wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
+```
+
+2. Just run (the defaults work just fine for recent Ubuntu & Debian releases)
+```bash
 mytop
 ```
 
