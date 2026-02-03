@@ -1,15 +1,10 @@
-# mytop v2.0
+# mytop
 
 A powerful MySQL and MariaDB monitoring tool for the command line, displaying real-time server performance information similar to the Unix `top` command.
 
 ## About This Version
 
 **mytop v2.0** includes comprehensive compatibility patches for MySQL 8.0+ and modern MariaDB versions.
-
-### Authors
-- **Fotis Evangelou (vibe coded with Claude)** - MySQL 8.0 & MariaDB 10.3 or newer compatibility patches (from 2026)
-- **Mark Grennan** - MySQL 5.x updates (from 2010 and up to v1.9.1)
-- **Jeremy D. Zawodny** - Original developer (from 2000 and up to v1.7 around 2009)
 
 ---
 
@@ -389,11 +384,11 @@ GNU General Public License
 
 ### Core Contributors
 
-- **Jeremy D. Zawodny** - Original author and maintainer (2000-2010)
+- **Jeremy D. Zawodny** - Original author and maintainer (2000-2009)
   - http://jeremy.zawodny.com/mysql/mytop/
 - **Mark Grennan** - MySQL 5.x updates and enhancements (2010-2012)
   - https://www.mysqlfanboy.com/mytop-3/
-- **Fotis Evangelou (vibe coded with Claude)** - Updated to support MySQL 8.0 & MariaDB 10.3 or newer (2026)
+- **Fotis Evangelou (vibe coded with Claude)** - Updated to support MySQL 8.0 & MariaDB 10.3 or newer releases (2026+)
 
 ### Additional Contributors
 
