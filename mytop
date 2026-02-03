@@ -59,6 +59,9 @@ BEGIN {
             print STDERR "Install the required packages with:\n";
             print STDERR
               "  sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n\n";
+            print STDERR "--- OR ---";
+            print STDERR
+              "  sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey\n\n";
         }
         else {
             print STDERR "Please install the required Perl modules:\n";
