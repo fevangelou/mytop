@@ -13,7 +13,7 @@ A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** dis
 # 1. Download & make executable
 wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
 
-# 2. Just run (the defaults work just fine for recent Ubuntu & Debian releases)
+# 2. Just run (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
 mytop
 ```
 
@@ -42,7 +42,7 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 - MySQL 8.0 completely removed the query cache feature
 - Added intelligent detection that checks for `have_query_cache` variable
 - Falls back to checking `Qcache_hits` status variable for older versions
-- Safely defaults to disabled for MySQL 8+
+- Safely defaults to disabled for MySQL 8.0 or newer
 
 #### Safe Status Variables
 - All `Qcache_*` status variable references now use null coalescing
@@ -63,7 +63,6 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 
 #### Dependency Checking
 - Automatic detection of missing Perl modules (DBI, DBD::mysql, Term::ReadKey)
-- Smart OS detection for Ubuntu 24.04+
 - Provides exact installation commands based on your distribution
 
 #### Better Defaults
@@ -85,7 +84,7 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 
 mytop requires the following Perl modules:
 
-#### On Ubuntu 22.04+ / Debian 11+
+#### On Debian 11+ or Ubuntu 22.04+
 ```bash
 sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl
 ```
@@ -114,7 +113,7 @@ No need to run `make` and `make install` as with previous versions - mytop is a 
 # 1. Download & make executable
 wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
 
-# 2. Just run (the defaults work just fine for recent Ubuntu and Debian releases)
+# 2. Just run (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
 mytop
 
 ```
@@ -273,7 +272,6 @@ MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
 - Improved error messages for EXPLAIN failures
 - Made query cache hit ratio calculations safe when variables don't exist
 - Updated default configuration (db: mysql, delay: 1s, idle: 2)
-- Added dependency checking with helpful installation messages for Ubuntu 24.04+
 - Added Term::ReadKey to dependency checks
 - Fixed all Perl syntax warnings and code quality issues
 

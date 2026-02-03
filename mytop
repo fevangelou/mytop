@@ -13,7 +13,7 @@
 # v2.0 - Feb 3rd, 2026:
 # - MySQL 8.0+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
 # - Added helpful error message if DBI/DBD::mysql modules are missing
-# - Better defaults for Debian/Ubuntu
+# - Better defaults out-of-the-box
 # - No need to run make & make install - just copy the mytop script into /usr/local/sbin and make it executable.
 
 use 5.005;
@@ -63,7 +63,7 @@ BEGIN {
         else {
             print STDERR "Please install the required Perl modules:\n";
             print STDERR
-"  - On Debian/Ubuntu: sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl\n";
+"  - On Debian 11/Ubuntu 22.04 or newer releases: sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl\n";
             print STDERR
 "  - On RHEL distros including AlmaLinux, CentOS, Fedora & Rocky (from v7 or newer - where applicable): sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n";
             print STDERR "  - Via CPAN: cpan DBI DBD::mysql Term::ReadKey\n\n";
