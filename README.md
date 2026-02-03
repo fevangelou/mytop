@@ -149,24 +149,32 @@ Run `mytop --help` to see all options:
 Once mytop is running, use these keys:
 
 - `?` - Display help
-- `#` - Display only threads from a specific database
-- `c` - Toggle color on/off
-- `d` - Show only specific database
-- `e` - Explain a query
-- `f` - Filter display by query text
+- `!` - Force past a replication error (at your own risk)
+- `c` - Switch to command summary mode
+- `C` - Toggle color display on/off
+- `d` - Filter by specific database
+- `E` - Display current replication error
+- `e` - Explain a query by thread ID
 - `F` - Remove all filters
-- `h` - Toggle header display
-- `i` - Toggle idle thread display
-- `I` - Toggle full idle command display
+- `f` - Show full query info for a thread
+- `h` - Filter by hostname
+- `H` - Toggle header display
+- `i` - Toggle idle (sleeping) thread display
+- `I` - Show InnoDB status
 - `k` - Kill a specific thread
-- `l` - Display full queries (toggle long)
-- `m` - Toggle display mode (top threads, command summary, replication)
+- `K` - Kill all threads owned by a specific user
+- `l` - Change long running query highlighting threshold
+- `m` - Switch to QPS (queries per second) mode
 - `o` - Reverse sort order
 - `p` - Pause display updates
 - `q` - Quit
-- `r` - Reverse sort order
-- `s` - Change refresh delay
-- `u` - Show threads from specific user
+- `r` - Reset status counters (FLUSH STATUS)
+- `R` - Toggle reverse DNS lookup for IP addresses
+- `s` - Change refresh delay in seconds
+- `S` - Change slow query highlighting threshold
+- `t` - Filter by thread state
+- `u` - Filter by specific user
+- `V` - Show MySQL variables
 
 ### Display Information
 
