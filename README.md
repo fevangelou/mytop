@@ -83,7 +83,7 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 
 ## INSTALLATION INSTRUCTIONS
 
-### Prerequisites
+### 1. Prerequisites
 
 mytop requires the following Perl modules:
 
@@ -107,7 +107,7 @@ sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey
 cpan DBI DBD::mysql Term::ReadKey
 ```
 
-### One-line installation
+### 2. One-line installation
 
 No need to run `make` and `make install` as with previous versions - mytop is a standalone Perl script:
 
@@ -120,6 +120,15 @@ cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x myt
 mytop
 
 ```
+
+#### Hint: If you have an older mytop version already installed on your system and you wanna use this new version in parallel, just name it mytop2 when moving it, e.g.:
+```bash
+cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/sbin/mytop2
+```
+
+Then run with `mytop2`.
+
+Otherwise just remove the old mytop version (e.g. via `apt remove mytop` or `yum remove mytop`) and install normally as shown above in point (2).
 
 ---
 
