@@ -10,12 +10,12 @@ A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** dis
 
 ## I know mytop - just show me how to install it
 
-1. Download mytop into /usr/local/sbin & make executable
+1. Clone the repo, make mytop executable and copy it into /usr/local/sbin/
 ```bash
-wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
+cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/sbin/
 ```
 
-2. Just run (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
+2. Run anywhere (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
 ```bash
 mytop
 ```
@@ -113,10 +113,10 @@ No need to run `make` and `make install` as with previous versions - mytop is a 
 
 ```bash
 
-# 1. Download & make executable
-wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
+# 1. Clone the repo, make mytop executable and copy it into /usr/local/sbin/
+cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/sbin/
 
-# 2. Just run (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
+# 2. Run anywhere (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
 mytop
 
 ```
