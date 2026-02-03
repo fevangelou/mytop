@@ -240,6 +240,7 @@ mytop --db information_schema
 
 # Batch mode (non-interactive)
 mytop --batch
+```
 
 ---
 
