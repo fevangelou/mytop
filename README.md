@@ -397,10 +397,6 @@ GNU General Public License
   - https://www.mysqlfanboy.com/mytop-3/
 - **Fotis Evangelou (vibe coded with Claude)** - Updated to support MySQL 8.0 & MariaDB 10.3 or newer releases (2026+)
 
-### Additional Contributors
-
-Many thanks to all contributors who have submitted bug fixes and feature requests over the years. See the CREDITS section in the mytop script for a full list.
-
 ---
 
 **mytop v2.0** - Keeping a classic MySQL monitoring tool alive for modern database versions.
