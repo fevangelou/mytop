@@ -961,7 +961,7 @@ sub GetData() {
 
         my $db_type = $is_mariadb ? "MariaDB" : "MySQL";
         printf "%-${host_width}s%${up_width}s\n",
-          "$db_type $db_version on $config{host} - mytop $main::VERSION",
+          "$db_type $db_version on $config{host} -- mytop v$main::VERSION",
           "load $l up $uptime $current_time";
         $lines_left--;
 
