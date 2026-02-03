@@ -121,11 +121,11 @@ socket=/var/run/mysqld/mysqld.sock
 
 Run `mytop --help` to see all options:
 
-- `-u <user>` - MySQL username (default: root)
-- `-p <password>` - MySQL password
-- `-h <host>` - MySQL server host (default: localhost)
-- `-P <port>` - MySQL server port (default: 3306)
-- `-S <socket>` - MySQL socket file
+- `-u <user>` - MySQL/MariaDB username (default: root)
+- `-p <password>` - MySQL/MariaDB password
+- `-h <host>` - MySQL/MariaDB server host (default: localhost)
+- `-P <port>` - MySQL/MariaDB server port (default: 3306)
+- `-S <socket>` - MySQL/MariaDB socket file
 - `-d <database>` - Database to use (default: mysql)
 - `-b` - Batch mode, print and exit
 - `-s <seconds>` - Refresh delay in seconds (default: 1)
@@ -174,13 +174,13 @@ Once mytop is running, use these keys:
 - `S` - Change slow query highlighting threshold
 - `t` - Filter by thread state
 - `u` - Filter by specific user
-- `V` - Show MySQL variables
+- `V` - Show MySQL/MariaDB variables
 
 ### Display Information
 
 mytop shows:
 
-1. **Header Section**: MySQL uptime, queries per second (QPS), load average, query cache hit rate (if available)
+1. **Header Section**: MySQL/MariaDB uptime, queries per second (QPS), load average, query cache hit rate (if available)
 2. **Active Threads**: Currently running queries with:
    - Thread ID
    - Username
@@ -220,7 +220,7 @@ mytop --user root --password secret --host localhost --db mysql
 ### Basic Usage
 
 ```bash
-# Connect to local MySQL with default settings
+# Connect to local MySQL/MariaDB with default settings
 mytop
 
 # Connect to remote server
@@ -389,4 +389,4 @@ GNU General Public License
 
 ---
 
-**mytop v2.0** - Keeping a classic MySQL monitoring tool alive for modern database versions.
+**mytop v2.0** - Keeping a classic MySQL/MariaDB monitoring tool alive for modern database versions.
