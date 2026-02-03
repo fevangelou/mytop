@@ -11,10 +11,10 @@
 
 # --- CHANGELOG ---
 # v2.0 - Feb 3rd, 2026:
-# - MySQL 8+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
+# - MySQL 8.0+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
 # - Added helpful error message if DBI/DBD::mysql modules are missing
 # - Better defaults for Debian/Ubuntu
-# - No need to run make & make install - just copy the mytop script into: /usr/local/sbin/
+# - No need to run make & make install - just copy the mytop script into /usr/local/sbin and make it executable.
 
 use 5.005;
 use strict;
@@ -33,37 +33,39 @@ BEGIN {
         print STDERR "\nError: Required Perl modules are missing: "
           . join( ', ', @missing_modules ) . "\n\n";
 
-        # Check if we're on Ubuntu 24.04 or newer
-        my $is_ubuntu_24_plus = 0;
+        # Detect OS family to provide appropriate installation command
+        my $os_family = '';
         if ( -f "/etc/os-release" ) {
             if ( open my $fh, '<', '/etc/os-release' ) {
-                while ( my $line = <$fh> ) {
-                    if ( $line =~ /^ID=ubuntu/i ) {
-                        while ( my $ver_line = <$fh> ) {
-                            if ( $ver_line =~ /^VERSION_ID="(\d+)\.(\d+)"/ ) {
-                                $is_ubuntu_24_plus = 1 if $1 >= 24;
-                                last;
-                            }
-                        }
-                        last;
-                    }
-                }
+                my $content = do { local $/; <$fh> };
                 close $fh;
+                if ( $content =~ /^ID(?:_LIKE)?=.*(debian|ubuntu)/im ) {
+                    $os_family = 'debian';
+                }
+                elsif ( $content =~
+                    /^ID(?:_LIKE)?=.*(rhel|centos|fedora|rocky|alma)/im )
+                {
+                    $os_family = 'rhel';
+                }
             }
         }
 
-        if ($is_ubuntu_24_plus) {
-            print STDERR
-              "On Ubuntu 24.04 or newer, install the required packages with:\n";
+        if ( $os_family eq 'debian' ) {
+            print STDERR "Install the required packages with:\n";
             print STDERR
 "  sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl\n\n";
+        }
+        elsif ( $os_family eq 'rhel' ) {
+            print STDERR "Install the required packages with:\n";
+            print STDERR
+              "  sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n\n";
         }
         else {
             print STDERR "Please install the required Perl modules:\n";
             print STDERR
 "  - On Debian/Ubuntu: sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl\n";
             print STDERR
-"  - On RHEL/CentOS: sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n";
+"  - On RHEL distros including AlmaLinux, CentOS, Fedora & Rocky (from v7 or newer - where applicable): sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n";
             print STDERR "  - Via CPAN: cpan DBI DBD::mysql Term::ReadKey\n\n";
         }
         exit 1;
@@ -1726,35 +1728,36 @@ sub trim($) {
 
 sub PrintHelp() {
     my $help = qq[
+
 Help for mytop (version $main::VERSION):
 
-  ? - display this screen
-  # - toggle short/long numbers (not yet implemented)
-  c - command summary view (based on Com_* counters)
-  C - turn color on and off
-  d - show only a specific database
-  e - explain the query that a thread is running
-  E - display current replication error
-  f - show full query info for a given thread
-  F - unFilter the dispaly
-  h - show only a specifc host's connections
-  H - toggle the mytop header
-  i - toggle the display of idle (sleeping) threads
-  I - show innodb status
-  k - kill a thread
-  p - pause the display
-  l - change long running queries hightlighing
-  m - switch [mode] to qps (queries/sec) scrolling view
-  o - reverse the sort order (toggle)
-  q - quit
-  r - reset the status counters (via FLUSH STATUS on your server)
-  R - change reverse IP lookup
-  s - change the delay between screen updates
-  S - change slow quiery hightlighting
-  t - switch to thread view (default)
-  u - show only a specific user
-  : - enter a command (not yet implemented)
-  ! - Skip an error that has stopped replications (at your own risk)
+    ? - Display help
+    ! - Force past a replication error (at your own risk)
+    c - Switch to command summary mode
+    C - Toggle color display on/off
+    d - Filter by specific database
+    E - Display current replication error
+    e - Explain a query by thread ID
+    F - Remove all filters
+    f - Show full query info for a thread
+    h - Filter by hostname
+    H - Toggle header display
+    i - Toggle idle (sleeping) thread display
+    I - Show InnoDB status
+    k - Kill a specific thread
+    K - Kill all threads owned by a specific user
+    l - Change long running query highlighting threshold
+    m - Switch to QPS (queries per second) mode
+    o - Reverse sort order
+    p - Pause display updates
+    q - Quit
+    r - Reset status counters (FLUSH STATUS)
+    R - Toggle reverse DNS lookup for IP addresses
+    s - Change refresh delay in seconds
+    S - Change slow query highlighting threshold
+    t - Filter by thread state
+    u - Filter by specific user
+    V - Show MySQL/MariaDB variables
 
 CREDITS
 - mytop was originally written by Jeremy Zawodny from 2000 and up to v1.7 (around 2009)
