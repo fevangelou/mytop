@@ -3,6 +3,10 @@
 A powerful MySQL and MariaDB monitoring tool for the command line, displaying real-time database server performance information similar to `top`.
 
 
+## Current Version
+v2.0 - released on Feb 3rd, 2026
+
+
 ## About
 
 This is a fork of the original mytop Perl script, updated for MySQL 8.x & MariaDB 10.3+ (or newer) releases.
