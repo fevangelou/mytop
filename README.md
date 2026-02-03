@@ -93,7 +93,7 @@ No need to run `make` and `make install` as with previous versions - mytop is a 
 # Download & make executable
 wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
 
-# Just run (the default work just fine for recent Ubuntu and Debian releases)
+# Just run (the defaults work just fine for recent Ubuntu and Debian releases)
 mytop
 
 ```
