@@ -959,8 +959,9 @@ sub GetData() {
         Clear() unless $config{batchmode};
         print RESET();
 
+        my $db_type = $is_mariadb ? "MariaDB" : "MySQL";
         printf "%-${host_width}s%${up_width}s\n",
-          "MySQL on $config{host} ($db_version)",
+          "$db_type $db_version on $config{host} - mytop $main::VERSION",
           "load $l up $uptime $current_time";
         $lines_left--;
 
