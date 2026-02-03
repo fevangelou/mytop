@@ -83,6 +83,7 @@ sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl
 sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey
 ```
 or
+
 ```bash
 sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey
 ```
@@ -98,11 +99,13 @@ No need to run `make` and `make install` as with previous versions - mytop is a 
 
 ```bash
 
-# Download & make executable
+# 1. Download & make executable
 wget -O /usr/local/sbin/mytop https://raw.githubusercontent.com/fevangelou/mytop/refs/heads/main/mytop && chmod +x /usr/local/sbin/mytop
 
-# Just run (the defaults work just fine for recent Ubuntu and Debian releases)
+# 2. Just run (the defaults work just fine for recent Ubuntu and Debian releases)
 mytop
+
+```
 
 ---
 
