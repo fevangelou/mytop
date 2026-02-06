@@ -24,6 +24,8 @@ mytop
 
 ## ABOUT
 
+<img width="735" height="324" alt="mytop_v2 0_screenshot" src="https://github.com/user-attachments/assets/604a37de-20c1-418a-8eac-5649b2b4aeb5" />
+
 This is a fork of the original mytop Perl script, updated for MySQL 8.x & MariaDB 10.3+ (or newer) releases.
 
 It is not a half-baked todo-when-I-get-the-time fork.
