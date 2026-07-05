@@ -6,7 +6,7 @@ A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** dis
 ## Current Version
 **v2.1** - released on Jul 5th, 2026
 
-***See [CHANGELOG](./#CHANGELOG) section for more info***
+***See [CHANGELOG](#CHANGELOG) section for more info***
 
 ---
 
