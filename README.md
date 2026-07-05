@@ -12,9 +12,9 @@ A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** dis
 
 ## I know mytop - just show me how to install it
 
-1. Clone the repo, make mytop executable and copy it into /usr/local/bin/
+1. Download mytop directly into /usr/local/bin/ and make it executable
 ```bash
-cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/bin/
+curl -fsSL -o /usr/local/bin/mytop https://raw.githubusercontent.com/fevangelou/mytop/main/mytop && chmod +x /usr/local/bin/mytop
 ```
 
 2. Run anywhere (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
@@ -130,12 +130,12 @@ cpan DBI DBD::MariaDB Term::ReadKey
 
 ### 2. One-line installation
 
-No need to run `make` and `make install` as with previous versions - mytop is a standalone Perl script:
+No need to run `make` and `make install`, clone the repo, or fetch a tarball as with previous versions - mytop is a standalone Perl script, so grab it directly:
 
 ```bash
 
-# 1. Clone the repo, make mytop executable and copy it into /usr/local/bin/
-cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/bin/
+# 1. Download mytop directly into /usr/local/bin/ and make it executable
+curl -fsSL -o /usr/local/bin/mytop https://raw.githubusercontent.com/fevangelou/mytop/main/mytop && chmod +x /usr/local/bin/mytop
 
 # 2. Run anywhere (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
 mytop
