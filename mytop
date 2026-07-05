@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # /**
-#  * @version    2.0
+#  * @version    2.1
 #  * @package    mytop
 #  * @author     Fotis Evangelou - originally by Jeremy Zawodny & Mark Grennan
 #  * @url        https://github.com/fevangelou/mytop
@@ -10,22 +10,49 @@
 #  */
 
 # --- CHANGELOG ---
+# v2.1 - Jul 5th, 2026:
+# - Dual DBD driver support: use DBD::mysql if present, fall back to DBD::MariaDB
+#   (fixes systems using MariaDB.org/cPanel repos on RHEL 9+, where perl-DBD-MySQL's
+#   mysql-common dependency conflicts with MariaDB-common, and DBD::mysql 5.x no
+#   longer compiles against MariaDB's client library)
+# - Dependency checker now detects the MariaDB-common conflict on RHEL-family systems
+#   and suggests the correct CPAN-based fix instead of a dnf command that will fail
+# - Strip stray non-printing control bytes (e.g. embedded ESC sequences) from displayed
+#   query text so they can't corrupt or inject escape sequences into the terminal
+#
 # v2.0 - Feb 3rd, 2026:
 # - MySQL 8.0+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
 # - Added helpful error message if DBI/DBD::mysql modules are missing
 # - Better defaults out-of-the-box
-# - No need to run make & make install - just copy the mytop script into /usr/local/sbin and make it executable.
+# - No need to run make & make install - just copy the mytop script into /usr/local/bin and make it executable.
 
 use 5.005;
 use strict;
+
+## Which DBD driver we ended up using ('mysql' or 'MariaDB') - set in the BEGIN
+## block below and used later on to build the DSN and connection attribute names.
+our $DBI_DRIVER;
 
 ## Check for required DBI modules and provide helpful error message
 BEGIN {
     my @missing_modules;
 
     eval { require DBI; DBI->import(); 1; } or push @missing_modules, 'DBI';
-    eval { require DBD::mysql; DBD::mysql->import(); 1; }
-      or push @missing_modules, 'DBD::mysql';
+
+    ## Prefer DBD::mysql (the common case), fall back to DBD::MariaDB - the
+    ## actively maintained driver built against MariaDB's own client library.
+    ## This matters on RHEL 9+ systems using MariaDB.org/cPanel repos, where
+    ## DBD::mysql 5.x won't compile against MariaDB's connector at all.
+    if ( eval { require DBD::mysql; DBD::mysql->import(); 1; } ) {
+        $DBI_DRIVER = 'mysql';
+    }
+    elsif ( eval { require DBD::MariaDB; DBD::MariaDB->import(); 1; } ) {
+        $DBI_DRIVER = 'MariaDB';
+    }
+    else {
+        push @missing_modules, 'DBD::mysql or DBD::MariaDB';
+    }
+
     eval { require Term::ReadKey; Term::ReadKey->import(); 1; }
       or push @missing_modules, 'Term::ReadKey';
 
@@ -62,6 +89,27 @@ BEGIN {
             print STDERR "  ~ OR ~\n\n";
             print STDERR
               "  sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey\n\n";
+
+            # On MariaDB.org/cPanel repo systems, MariaDB-common conflicts with
+            # mysql-common, so perl-DBD-MySQL can't be installed via dnf/yum at all.
+            my $has_mariadb_common = 0;
+            if ( open my $rpm, '-|', 'rpm -q MariaDB-common 2>/dev/null' ) {
+                my $out = do { local $/; <$rpm> };
+                close $rpm;
+                $has_mariadb_common = 1 if $out =~ /^MariaDB-common-/m;
+            }
+
+            if ($has_mariadb_common) {
+                print STDERR
+"NOTE: This system has MariaDB-common installed (MariaDB.org/cPanel repos), which\n";
+                print STDERR
+"conflicts with perl-DBD-MySQL's mysql-common dependency - the commands above will fail.\n\n";
+                print STDERR "Install the driver via CPAN instead:\n";
+                print STDERR "  sudo cpan DBD::MariaDB\n\n";
+                print STDERR
+                  "  ~ OR (last release built against MariaDB's client library) ~\n\n";
+                print STDERR "  sudo cpan -T DVEEDEN/DBD-mysql-4.050.tar.gz\n\n";
+            }
         }
         else {
             print STDERR "Please install the required Perl modules:\n";
@@ -69,7 +117,10 @@ BEGIN {
 "  - On Debian 11/Ubuntu 22.04 or newer releases: sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl\n";
             print STDERR
 "  - On RHEL distros including AlmaLinux, CentOS, Fedora & Rocky (from v7 or newer - where applicable): sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n";
-            print STDERR "  - Via CPAN: cpan DBI DBD::mysql Term::ReadKey\n\n";
+            print STDERR
+              "  - Via CPAN: cpan DBI DBD::mysql Term::ReadKey\n";
+            print STDERR
+"  - Via CPAN, if the above fails to compile (e.g. MariaDB.org/cPanel repos on RHEL 9+): cpan DBD::MariaDB\n\n";
         }
         exit 1;
     }
@@ -78,7 +129,7 @@ BEGIN {
 use Getopt::Long;
 use Socket;
 
-$main::VERSION = "2.0";
+$main::VERSION = "2.1";
 
 $| = 1;
 $0 = 'mytop';
@@ -266,10 +317,14 @@ my $dsn;
 
 ## Socket takes precedence.
 
-$dsn = "DBI:mysql:database=$config{db};mysql_read_default_group=mytop;";
+## DBD::MariaDB renames all mysql_* connection attributes to mariadb_*.
+my $attr_prefix = ( $DBI_DRIVER eq 'MariaDB' ) ? 'mariadb' : 'mysql';
+
+$dsn =
+  "DBI:$DBI_DRIVER:database=$config{db};${attr_prefix}_read_default_group=mytop;";
 
 if ( $config{socket} and -S $config{socket} ) {
-    $dsn .= "mysql_socket=$config{socket}";
+    $dsn .= "${attr_prefix}_socket=$config{socket}";
 }
 else {
     $dsn .= "host=$config{host};port=$config{port}";
@@ -1234,6 +1289,11 @@ sub GetData() {
             ## collapse whitespace
             $thread->{Info} =~ s/\s+/ /g;
         }
+
+        ## strip any remaining non-printing control bytes (e.g. stray ESC/NUL from
+        ## binary data embedded in stored query text) so they can't corrupt or
+        ## inject escape sequences into the terminal display
+        $thread->{Info} =~ s/[[:cntrl:]]//g;
 
         ## stow it in the cache
 

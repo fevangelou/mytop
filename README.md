@@ -4,15 +4,17 @@ A powerful MySQL and MariaDB monitoring tool for the command line, **mytop** dis
 
 
 ## Current Version
-**v2.0** - released on Feb 3rd, 2026
+**v2.1** - released on Jul 5th, 2026
+
+***See [#changelog](CHANGELOG) section for more info***
 
 ---
 
 ## I know mytop - just show me how to install it
 
-1. Clone the repo, make mytop executable and copy it into /usr/local/sbin/
+1. Clone the repo, make mytop executable and copy it into /usr/local/bin/
 ```bash
-cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/sbin/
+cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/bin/
 ```
 
 2. Run anywhere (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
@@ -67,7 +69,8 @@ Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it
 ### User Experience Improvements
 
 #### Dependency Checking
-- Automatic detection of missing Perl modules (DBI, DBD::mysql, Term::ReadKey)
+- Automatic detection of missing Perl modules (DBI, DBD::mysql or DBD::MariaDB, Term::ReadKey)
+- Detects the `MariaDB-common`/`mysql-common` package conflict on RHEL-family systems and suggests the correct CPAN fix
 - Provides exact installation commands based on your distribution
 
 #### Better Defaults
@@ -104,9 +107,25 @@ or
 sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey
 ```
 
+##### RHEL 9+ with MariaDB.org or cPanel repos (`MariaDB-common` installed)
+
+If your system uses MariaDB's own repos (or cPanel's MariaDB packages) instead of the distro's stock MariaDB/MySQL packages, the commands above will fail: `perl-DBD-MySQL` depends on `mysql-common`, which conflicts with `MariaDB-common`. On top of that, the current `DBD::mysql` 5.x on CPAN no longer compiles against MariaDB's client library (it requires MySQL 8.x client headers). Check with `rpm -q MariaDB-common` - if it's installed, use CPAN with the MariaDB-native driver instead:
+
+```bash
+sudo dnf install gcc make MariaDB-devel   # build prerequisites
+sudo cpan DBD::MariaDB
+```
+
+mytop detects and uses `DBD::MariaDB` automatically if `DBD::mysql` isn't available - no configuration needed.
+
 #### Via CPAN (for the purists)
 ```bash
 cpan DBI DBD::mysql Term::ReadKey
+```
+
+Or, if that fails to compile against your MariaDB client library (see above):
+```bash
+cpan DBI DBD::MariaDB Term::ReadKey
 ```
 
 ### 2. One-line installation
@@ -115,22 +134,13 @@ No need to run `make` and `make install` as with previous versions - mytop is a 
 
 ```bash
 
-# 1. Clone the repo, make mytop executable and copy it into /usr/local/sbin/
-cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/sbin/
+# 1. Clone the repo, make mytop executable and copy it into /usr/local/bin/
+cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/bin/
 
 # 2. Run anywhere (the defaults work just fine on Debian 11+, Ubuntu 22.04+ and RHEL distros v7 or newer)
 mytop
 
 ```
-
-#### Hint: If you have an older mytop version already installed on your system and you wanna use this new version in parallel, just name it mytop2 when moving it, e.g.:
-```bash
-cd ~/; git clone https://github.com/fevangelou/mytop.git; cd mytop; chmod +x mytop; cp -f mytop /usr/local/sbin/mytop2
-```
-
-Then run with `mytop2`.
-
-Otherwise just remove the old mytop version (e.g. via `apt remove mytop` or `yum remove mytop`) and install normally as shown above in point (2).
 
 ---
 
@@ -272,6 +282,17 @@ mytop --batch
 ## CHANGELOG
 
 *This changelog provides a historical record of all previous versions.*
+
+### Version 2.1 - July 5th, 2026
+Dual DBD driver support added.
+
+mytop now works with either `DBD::mysql` **or** `DBD::MariaDB` - whichever is installed. At startup it tries `DBD::mysql` first, then falls back to `DBD::MariaDB`, and builds the DSN and connection attributes (`mysql_*` vs `mariadb_*`) accordingly. This fixes a real-world case on **RHEL 9-family systems (AlmaLinux, Rocky, etc.) using MariaDB.org or cPanel's MariaDB repos**: the distro's `perl-DBD-MySQL` package conflicts with `MariaDB-common` (via its `mysql-common` dependency), so it can't be installed via `dnf`/`yum` at all, and installing the current `DBD::mysql` from CPAN fails to compile because DBD::mysql 5.x hard-requires MySQL 8.x client libraries, not MariaDB's connector.
+
+The dependency checker now detects this exact conflict (`rpm -q MariaDB-common`) and points you at the CPAN-based fix instead of a `dnf` command that's guaranteed to fail. See [Prerequisites](#1-prerequisites) below for the commands.
+
+Control character stripping fix.
+
+Displayed query text is now stripped of any stray non-printing control bytes (e.g. embedded ESC sequences or NUL bytes from binary data stored in a column) before being printed to the terminal, preventing corrupted or hijacked terminal output when such data shows up in `SHOW FULL PROCESSLIST`. This was inspired by a similar-looking line in MariaDB's own bundled `mytop`, which turned out to be dead code - `tr/[[:cntrl:]]//` is a no-op in Perl since `tr///` doesn't expand POSIX bracket classes - so this is a working implementation via `s/[[:cntrl:]]//g` instead.
 
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
@@ -423,4 +444,4 @@ GNU General Public License
 
 ---
 
-**mytop v2.0** - Keeping a classic MySQL/MariaDB monitoring tool alive for modern database versions.
+**mytop v2.1** - Keeping a classic MySQL/MariaDB monitoring tool alive for modern database versions.
