@@ -302,6 +302,10 @@ Fixed password default overriding `~/.my.cnf` credentials.
 
 mytop always passed an explicit password to `DBI->connect()` - `''` (empty string) by default - which overrides whatever the MySQL/MariaDB client library would otherwise auto-load from `[client]` in `~/.my.cnf` (e.g. `/root/.my.cnf`, as cPanel-managed MariaDB installs typically set up). This caused `Access denied for user 'root'@'localhost' (using password: NO)` on any system where root requires a real password, even though it was correctly configured in `.my.cnf`. The default password is now `undef` instead of `''`, so - unless you explicitly set one via `-p`, `--password`, `--prompt`, or `~/.mytop` - mytop now defers to `~/.my.cnf` exactly like the plain `mysql` CLI does when run without `-p`.
 
+Cleaner header display: load average and server version.
+
+The load average shown in the header now displays only the 1/5/15 minute figures in parentheses (e.g. `load (5.34 4.53 5.41)`), instead of dumping the entire raw `/proc/loadavg` line, which also included the running/total process count and the last PID (e.g. the old `load 5.34 4.53 5.41  11/6259 2580836`). Additionally, MariaDB's reported version string includes a redundant `-MariaDB` build suffix (e.g. `11.4.12-MariaDB`), which produced a duplicated `MariaDB 11.4.12-MariaDB` title; it's now stripped for display, matching MariaDB's own bundled `mytop`.
+
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
 

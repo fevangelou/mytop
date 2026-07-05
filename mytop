@@ -27,6 +27,11 @@
 #   to ~/.my.cnf (e.g. /root/.my.cnf on cPanel/RHEL boxes) instead of always sending a
 #   literal blank password that overrides it and gets rejected with "Access denied
 #   for user 'root'@'localhost' (using password: NO)"
+# - Load average now shows only the 1/5/15 min figures in parens, e.g. "load (5.34
+#   4.53 5.41)", instead of dumping the whole raw /proc/loadavg line (which also
+#   included running/total process counts and the last PID)
+# - Strip the "-MariaDB"/"-log" build suffix from the displayed server version (e.g.
+#   "11.4.12-MariaDB" -> "11.4.12") to avoid the redundant "MariaDB ... -MariaDB" title
 #
 # v2.0 - Feb 3rd, 2026:
 # - MySQL 8.0+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
@@ -418,6 +423,11 @@ foreach (@variables) {
             # MySQL version
             $db_release = int( sprintf( "%d", $db_version ) );
         }
+
+        # Strip any "-MariaDB"/"-log"/etc. build suffix for display purposes
+        # (e.g. "11.4.12-MariaDB" -> "11.4.12")
+        $db_version = $1 if ( $db_version =~ /^([^-]+)-/ );
+
         next;
     }
     if ( $_->{Variable_name} eq "have_query_cache" ) {
@@ -995,10 +1005,14 @@ sub GetData() {
 
         my $l = '';
         if ( open L, "</proc/loadavg" ) {
-            $l = <L>;
+            my $loadavg_line = <L>;
             close L;
-            chomp $l if defined $l;
-            $l ||= '';
+
+            # Only the first 3 fields (1/5/15 min load averages) are of interest -
+            # the rest of the line is running/total process counts and last PID.
+            if ( defined $loadavg_line ) {
+                $l = join( ' ', ( split /\s+/, $loadavg_line )[ 0 .. 2 ] );
+            }
         }
         else {
             # /proc/loadavg doesn't exist on non-Linux systems
@@ -1039,7 +1053,7 @@ sub GetData() {
         my $db_type = $is_mariadb ? "MariaDB" : "MySQL";
         printf "%-${host_width}s%${up_width}s\n",
           "$db_type $db_version on $config{host} -- mytop v$main::VERSION",
-          "load $l up $uptime $current_time";
+          ( $l ne '' ? "load ($l) " : '' ) . "up $uptime $current_time";
         $lines_left--;
 
         printf
