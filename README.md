@@ -294,6 +294,10 @@ Control character stripping fix.
 
 Displayed query text is now stripped of any stray non-printing control bytes (e.g. embedded ESC sequences or NUL bytes from binary data stored in a column) before being printed to the terminal, preventing corrupted or hijacked terminal output when such data shows up in `SHOW FULL PROCESSLIST`. This was inspired by a similar-looking line in MariaDB's own bundled `mytop`, which turned out to be dead code - `tr/[[:cntrl:]]//` is a no-op in Perl since `tr///` doesn't expand POSIX bracket classes - so this is a working implementation via `s/[[:cntrl:]]//g` instead.
 
+Fixed `localhost` connection failure under `DBD::MariaDB`.
+
+The default connection settings (`host=localhost`) failed with `Connection error: port cannot be specified when host is localhost or embedded` on systems using the `DBD::MariaDB` fallback. `DBD::mysql` has always silently ignored a port specified alongside `host=localhost` (since "localhost" means "use the local socket" to every MySQL/MariaDB client), but `DBD::MariaDB` validates the DSN strictly and rejects the combination outright. The DSN builder now omits the port whenever `host` is `localhost`, regardless of which driver is active. Only affects systems where `DBD::MariaDB` is the active driver (e.g. RHEL 9+ with MariaDB.org/cPanel repos) - unaffected on systems using `DBD::mysql` (e.g. Ubuntu 22.04 with MySQL 8.0).
+
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
 

@@ -19,6 +19,10 @@
 #   and suggests the correct CPAN-based fix instead of a dnf command that will fail
 # - Strip stray non-printing control bytes (e.g. embedded ESC sequences) from displayed
 #   query text so they can't corrupt or inject escape sequences into the terminal
+# - Fixed connection failure under DBD::MariaDB when host is "localhost": the DSN no
+#   longer sends a port alongside it, since DBD::MariaDB (unlike DBD::mysql) rejects
+#   that combination outright ("port cannot be specified when host is localhost or
+#   embedded"). Only affects systems using the DBD::MariaDB fallback.
 #
 # v2.0 - Feb 3rd, 2026:
 # - MySQL 8.0+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
@@ -325,6 +329,15 @@ $dsn =
 
 if ( $config{socket} and -S $config{socket} ) {
     $dsn .= "${attr_prefix}_socket=$config{socket}";
+}
+elsif ( lc( $config{host} ) eq 'localhost' ) {
+
+    ## "localhost" means "connect via the local socket" to every MySQL/MariaDB
+    ## client - specifying a port alongside it is meaningless, and DBD::MariaDB
+    ## (unlike DBD::mysql, which just silently ignores it) rejects the DSN
+    ## outright with "port cannot be specified when host is localhost or
+    ## embedded". Omit the port here and let the driver find the default socket.
+    $dsn .= "host=$config{host}";
 }
 else {
     $dsn .= "host=$config{host};port=$config{port}";
