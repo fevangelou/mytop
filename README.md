@@ -304,7 +304,7 @@ mytop always passed an explicit password to `DBI->connect()` - `''` (empty strin
 
 Cleaner header display: load average and server version.
 
-The load average and uptime shown in the header are now labeled and clearly separated, e.g. `Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 3+12:55:33 [14:03:22]`, instead of the old unlabeled `load 5.34 4.53 5.41  11/6259 2580836 up 3+12:55:33 [14:03:22]`, which also dumped the running/total process count and the last PID straight from the raw `/proc/loadavg` line. Additionally, MariaDB's reported version string includes a redundant `-MariaDB` build suffix (e.g. `11.4.12-MariaDB`), which produced a duplicated `MariaDB 11.4.12-MariaDB` title; it's now stripped for display, matching MariaDB's own bundled `mytop`.
+The load average and uptime shown in the header are now labeled and clearly separated, e.g. `Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 3+12:55:33`, instead of the old unlabeled `load 5.34 4.53 5.41  11/6259 2580836 up 3+12:55:33 [14:03:22]`, which also dumped the running/total process count and the last PID straight from the raw `/proc/loadavg` line. The current time now gets its own labeled line below (`Current Time: 14:03:22`) instead of being tacked on unlabeled at the end. Additionally, MariaDB's reported version string includes a redundant `-MariaDB` build suffix (e.g. `11.4.12-MariaDB`), which produced a duplicated `MariaDB 11.4.12-MariaDB` title; it's now stripped for display, matching MariaDB's own bundled `mytop`.
 
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches

@@ -28,9 +28,11 @@
 #   literal blank password that overrides it and gets rejected with "Access denied
 #   for user 'root'@'localhost' (using password: NO)"
 # - Load average and uptime in the header are now labeled and separated, e.g.
-#   "Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 3+12:55:33 [14:03:22]",
-#   instead of dumping the whole raw /proc/loadavg line unlabeled (which also
-#   included running/total process counts and the last PID)
+#   "Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 3+12:55:33", instead of
+#   dumping the whole raw /proc/loadavg line unlabeled (which also included
+#   running/total process counts and the last PID)
+# - Current time is now shown labeled on its own line below load avg/uptime,
+#   e.g. "Current Time: 14:50:16", instead of tacked on unlabeled at the end
 # - Strip the "-MariaDB"/"-log" build suffix from the displayed server version (e.g.
 #   "11.4.12-MariaDB" -> "11.4.12") to avoid the redundant "MariaDB ... -MariaDB" title
 #
@@ -1042,7 +1044,7 @@ sub GetData() {
 
         my @t = localtime(time);
 
-        my $current_time = sprintf "[%02d:%02d:%02d]", $t[2], $t[1], $t[0];
+        my $current_time = sprintf "%02d:%02d:%02d", $t[2], $t[1], $t[0];
 
         my $host_width = 75;
         my $up_width   = $width - $host_width;
@@ -1057,7 +1059,11 @@ sub GetData() {
           : '';
         printf "%-${host_width}s%${up_width}s\n",
           "$db_type $db_version on $config{host} -- mytop v$main::VERSION",
-          "${load_display}Uptime: $uptime $current_time";
+          "${load_display}Uptime: $uptime";
+        $lines_left--;
+
+        printf "%-${host_width}s%${up_width}s\n", '',
+          "Current Time: $current_time";
         $lines_left--;
 
         printf
