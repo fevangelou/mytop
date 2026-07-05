@@ -23,6 +23,10 @@
 #   longer sends a port alongside it, since DBD::MariaDB (unlike DBD::mysql) rejects
 #   that combination outright ("port cannot be specified when host is localhost or
 #   embedded"). Only affects systems using the DBD::MariaDB fallback.
+# - Default password is now undef instead of '', so an unset password properly defers
+#   to ~/.my.cnf (e.g. /root/.my.cnf on cPanel/RHEL boxes) instead of always sending a
+#   literal blank password that overrides it and gets rejected with "Access denied
+#   for user 'root'@'localhost' (using password: NO)"
 #
 # v2.0 - Feb 3rd, 2026:
 # - MySQL 8.0+ & MariaDB 10.3+ compatibility patches (EXPLAIN works again, query cache detection fixed, etc.)
@@ -203,7 +207,7 @@ my %config = (
     long_nums    => 0,
     mode         => 'top',
     prompt       => 0,
-    pass         => '',
+    pass         => undef,    # undef (not '') so an unset password defers to ~/.my.cnf, not a literal blank one
     port         => 3306,
     resolve      => 0,
     slow         => 10,            # slow query time
@@ -355,12 +359,17 @@ my $dbh =
   DBI->connect( $dsn, $config{user}, $config{pass}, { PrintError => 0 } );
 
 if ( not ref $dbh ) {
+    my $shown_pass =
+      defined $config{pass}
+      ? $config{pass}
+      : '(none - deferred to ~/.my.cnf, if present)';
+
     my $Error = <<EODIE
 Cannot connect to MySQL server. Please check the:
 
   * database you specified "$config{db}" (default is "test")
   * username you specified "$config{user}" (default is "root")
-  * password you specified "$config{pass}" (default is "")
+  * password you specified "$shown_pass" (default is to defer to ~/.my.cnf)
   * hostname you specified "$config{host}" (default is "localhost")
   * port you specified "$config{port}" (default is 3306)
   * socket you specified "$config{socket}" (default is "")

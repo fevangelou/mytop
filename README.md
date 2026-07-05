@@ -298,6 +298,10 @@ Fixed `localhost` connection failure under `DBD::MariaDB`.
 
 The default connection settings (`host=localhost`) failed with `Connection error: port cannot be specified when host is localhost or embedded` on systems using the `DBD::MariaDB` fallback. `DBD::mysql` has always silently ignored a port specified alongside `host=localhost` (since "localhost" means "use the local socket" to every MySQL/MariaDB client), but `DBD::MariaDB` validates the DSN strictly and rejects the combination outright. The DSN builder now omits the port whenever `host` is `localhost`, regardless of which driver is active. Only affects systems where `DBD::MariaDB` is the active driver (e.g. RHEL 9+ with MariaDB.org/cPanel repos) - unaffected on systems using `DBD::mysql` (e.g. Ubuntu 22.04 with MySQL 8.0).
 
+Fixed password default overriding `~/.my.cnf` credentials.
+
+mytop always passed an explicit password to `DBI->connect()` - `''` (empty string) by default - which overrides whatever the MySQL/MariaDB client library would otherwise auto-load from `[client]` in `~/.my.cnf` (e.g. `/root/.my.cnf`, as cPanel-managed MariaDB installs typically set up). This caused `Access denied for user 'root'@'localhost' (using password: NO)` on any system where root requires a real password, even though it was correctly configured in `.my.cnf`. The default password is now `undef` instead of `''`, so - unless you explicitly set one via `-p`, `--password`, `--prompt`, or `~/.mytop` - mytop now defers to `~/.my.cnf` exactly like the plain `mysql` CLI does when run without `-p`.
+
 ### Version 2.0 - February 3rd, 2026
 MySQL 8.0 & MariaDB 10.3 or newer compatibility patches
 
