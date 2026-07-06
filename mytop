@@ -28,9 +28,12 @@
 #   literal blank password that overrides it and gets rejected with "Access denied
 #   for user 'root'@'localhost' (using password: NO)"
 # - Load average and uptime in the header are now labeled and separated, e.g.
-#   "Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 3+12:55:33", instead of
-#   dumping the whole raw /proc/loadavg line unlabeled (which also included
+#   "Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 285 days, 11:08", instead
+#   of dumping the whole raw /proc/loadavg line unlabeled (which also included
 #   running/total process counts and the last PID)
+# - Uptime is now phrased like the classic `uptime` command ("285 days, 11:08" or
+#   "5 min" when under an hour) instead of a raw "D+HH:MM:SS" counter - nobody
+#   needs second-level precision on a duration usually measured in days
 # - Current time is now shown labeled on its own line below load avg/uptime,
 #   e.g. "Current Time: 14:50:16", instead of tacked on unlabeled at the end
 # - Strip the "-MariaDB"/"-log" build suffix from the displayed server version (e.g.
@@ -1026,17 +1029,19 @@ sub GetData() {
         ## Server Uptime in meaningful terms...
 
         my $time = $STATUS{Uptime};
-        my ( $d, $h, $m, $s ) = ( 0, 0, 0, 0 );
 
-        $d    += int( $time / ( 60 * 60 * 24 ) );
+        my $d = int( $time / ( 60 * 60 * 24 ) );
         $time -= $d * ( 60 * 60 * 24 );
-        $h    += int( $time / ( 60 * 60 ) );
+        my $h = int( $time / ( 60 * 60 ) );
         $time -= $h * ( 60 * 60 );
-        $m    += int( $time / (60) );
-        $time -= $m * (60);
-        $s    += int($time);
+        my $m = int( $time / 60 );
 
-        my $uptime = sprintf( "%d+%02d:%02d:%02d", $d, $h, $m, $s );
+        ## Match the classic `uptime` command's phrasing, e.g. "285 days, 11:08"
+        ## or "5 min" when under an hour - no point showing seconds-level precision
+        ## for something that's usually measured in days.
+        my $uptime_days = $d == 1 ? "1 day, " : $d > 1 ? "$d days, " : '';
+        my $uptime =
+          $uptime_days . ( $h == 0 ? "$m min" : sprintf( "%d:%02d", $h, $m ) );
 
         ## Queries per second...
 
