@@ -106,8 +106,8 @@ BEGIN {
             print STDERR
               "  sudo dnf install perl-DBI perl-DBD-MySQL perl-TermReadKey\n\n";
 
-            # On MariaDB.org/cPanel repo systems, MariaDB-common conflicts with
-            # mysql-common, so perl-DBD-MySQL can't be installed via dnf/yum at all.
+        # On MariaDB.org/cPanel repo systems, MariaDB-common conflicts with
+        # mysql-common, so perl-DBD-MySQL can't be installed via dnf/yum at all.
             my $has_mariadb_common = 0;
             if ( open my $rpm, '-|', 'rpm -q MariaDB-common 2>/dev/null' ) {
                 my $out = do { local $/; <$rpm> };
@@ -123,8 +123,9 @@ BEGIN {
                 print STDERR "Install the driver via CPAN instead:\n";
                 print STDERR "  sudo cpan DBD::MariaDB\n\n";
                 print STDERR
-                  "  ~ OR (last release built against MariaDB's client library) ~\n\n";
-                print STDERR "  sudo cpan -T DVEEDEN/DBD-mysql-4.050.tar.gz\n\n";
+"  ~ OR (last release built against MariaDB's client library) ~\n\n";
+                print STDERR
+                  "  sudo cpan -T DVEEDEN/DBD-mysql-4.050.tar.gz\n\n";
             }
         }
         else {
@@ -133,8 +134,7 @@ BEGIN {
 "  - On Debian 11/Ubuntu 22.04 or newer releases: sudo apt install libdbi-perl libdbd-mysql-perl libterm-readkey-perl\n";
             print STDERR
 "  - On RHEL distros including AlmaLinux, CentOS, Fedora & Rocky (from v7 or newer - where applicable): sudo yum install perl-DBI perl-DBD-MySQL perl-TermReadKey\n";
-            print STDERR
-              "  - Via CPAN: cpan DBI DBD::mysql Term::ReadKey\n";
+            print STDERR "  - Via CPAN: cpan DBI DBD::mysql Term::ReadKey\n";
             print STDERR
 "  - Via CPAN, if the above fails to compile (e.g. MariaDB.org/cPanel repos on RHEL 9+): cpan DBD::MariaDB\n\n";
         }
@@ -215,13 +215,15 @@ my %config = (
     long_nums    => 0,
     mode         => 'top',
     prompt       => 0,
-    pass         => undef,    # undef (not '') so an unset password defers to ~/.my.cnf, not a literal blank one
-    port         => 3306,
-    resolve      => 0,
-    slow         => 10,            # slow query time
-    socket       => '',
-    sort         => 1,             # default or reverse sort ("s")
-    user         => 'root'
+    pass         =>
+      undef
+    , # undef (not '') so an unset password defers to ~/.my.cnf, not a literal blank one
+    port    => 3306,
+    resolve => 0,
+    slow    => 10,      # slow query time
+    socket  => '',
+    sort    => 1,       # default or reverse sort ("s")
+    user    => 'root'
 );
 
 my %qcache    = ();    ## The query cache--used for full query info support.
@@ -337,7 +339,7 @@ my $dsn;
 my $attr_prefix = ( $DBI_DRIVER eq 'MariaDB' ) ? 'mariadb' : 'mysql';
 
 $dsn =
-  "DBI:$DBI_DRIVER:database=$config{db};${attr_prefix}_read_default_group=mytop;";
+"DBI:$DBI_DRIVER:database=$config{db};${attr_prefix}_read_default_group=mytop;";
 
 if ( $config{socket} and -S $config{socket} ) {
     $dsn .= "${attr_prefix}_socket=$config{socket}";
@@ -1011,15 +1013,15 @@ sub GetData() {
             my $loadavg_line = <L>;
             close L;
 
-            # Only the first 3 fields (1/5/15 min load averages) are of interest -
-            # the rest of the line is running/total process counts and last PID.
+          # Only the first 3 fields (1/5/15 min load averages) are of interest -
+          # the rest of the line is running/total process counts and last PID.
             if ( defined $loadavg_line ) {
                 ( $load1, $load5, $load15 ) =
                   ( split /\s+/, $loadavg_line )[ 0 .. 2 ];
             }
         }
 
-        # /proc/loadavg doesn't exist on non-Linux systems, so $load1 stays undef
+       # /proc/loadavg doesn't exist on non-Linux systems, so $load1 stays undef
 
         ## Server Uptime in meaningful terms...
 

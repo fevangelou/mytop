@@ -32,13 +32,11 @@ This is a fork of the original mytop Perl script, updated for MySQL 8.x & MariaD
 
 It is not a half-baked todo-when-I-get-the-time fork.
 
-As a day & night sysadmin, I use mytop... daily. Or at least, I did. My gradual switch to Ubuntu Server 24.04 left me with Innotop, which simply does not work right (especially when it comes to explaining queries - plus it never "clicked" as you had to configure it just for the basics you get from mytop out of the box - go figure). As such, forking mytop was the only sensible thing to do. And as long as I'm active as a sysadmin (17+ years already), I'll keep it updated.
+As a professional sysadmin, I had used mytop for years. My gradual switch to Ubuntu Server 24.04 though left me with Innotop as the only available (maintained) choice, which simply does not work right, especially when it comes to explaining queries. Plus it never "clicked" as a utility. You had to devote way too many brain cells to configure Innotop just to get the basics that mytop provided out of the box (go figure...). As such, forking mytop was the only sensible thing to do. And as long as I'm active as a sysadmin (17+ years already), I'll keep it updated.
 
-Yes, it has been "vibe coded" with the help of Anthropic's Claude (Perl was never my domain), but I have tested it extensively and since it's a daily tool for me, I'm gonna keep on maintaining it, as well as examine a possible rewrite to amother language.
+Yes, it has been "vibe coded" with the help of Anthropic's Claude (Perl was never my domain), but I have tested it extensively and since it's a daily tool for me, I'm gonna keep on maintaining it, as well as examine a possible rewrite to another language in the future.
 
-Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (updated it for MySQL 5.x).
-
-*P.S. Whoever said AI is killing open source is wrong. Needs and ways have just shifted. Embrace the new tooling.*
+Sincere thanks to Jeremy D. Zawodny (original author) & Mark Grennan (who updated mytop for MySQL 5.x).
 
 
 ## WHAT'S NEW
@@ -281,28 +279,28 @@ mytop --batch
 
 ## CHANGELOG
 
-*This changelog provides a historical record of all previous versions.*
+*This changelog also provides a historical record of all previous versions before 2.0.*
 
 ### Version 2.1 - July 5th, 2026
-Dual DBD driver support added.
+1. Dual DBD driver support added.
 
 mytop now works with either `DBD::mysql` **or** `DBD::MariaDB` - whichever is installed. At startup it tries `DBD::mysql` first, then falls back to `DBD::MariaDB`, and builds the DSN and connection attributes (`mysql_*` vs `mariadb_*`) accordingly. This fixes a real-world case on **RHEL 9-family systems (AlmaLinux, Rocky, etc.) using MariaDB.org or cPanel's MariaDB repos**: the distro's `perl-DBD-MySQL` package conflicts with `MariaDB-common` (via its `mysql-common` dependency), so it can't be installed via `dnf`/`yum` at all, and installing the current `DBD::mysql` from CPAN fails to compile because DBD::mysql 5.x hard-requires MySQL 8.x client libraries, not MariaDB's connector.
 
 The dependency checker now detects this exact conflict (`rpm -q MariaDB-common`) and points you at the CPAN-based fix instead of a `dnf` command that's guaranteed to fail. See [Prerequisites](#1-prerequisites) below for the commands.
 
-Control character stripping fix.
+2. Control character stripping fix.
 
 Displayed query text is now stripped of any stray non-printing control bytes (e.g. embedded ESC sequences or NUL bytes from binary data stored in a column) before being printed to the terminal, preventing corrupted or hijacked terminal output when such data shows up in `SHOW FULL PROCESSLIST`. This was inspired by a similar-looking line in MariaDB's own bundled `mytop`, which turned out to be dead code - `tr/[[:cntrl:]]//` is a no-op in Perl since `tr///` doesn't expand POSIX bracket classes - so this is a working implementation via `s/[[:cntrl:]]//g` instead.
 
-Fixed `localhost` connection failure under `DBD::MariaDB`.
+3. Fixed `localhost` connection failure under `DBD::MariaDB`.
 
 The default connection settings (`host=localhost`) failed with `Connection error: port cannot be specified when host is localhost or embedded` on systems using the `DBD::MariaDB` fallback. `DBD::mysql` has always silently ignored a port specified alongside `host=localhost` (since "localhost" means "use the local socket" to every MySQL/MariaDB client), but `DBD::MariaDB` validates the DSN strictly and rejects the combination outright. The DSN builder now omits the port whenever `host` is `localhost`, regardless of which driver is active. Only affects systems where `DBD::MariaDB` is the active driver (e.g. RHEL 9+ with MariaDB.org/cPanel repos) - unaffected on systems using `DBD::mysql` (e.g. Ubuntu 22.04 with MySQL 8.0).
 
-Fixed password default overriding `~/.my.cnf` credentials.
+4. Fixed password default overriding `~/.my.cnf` credentials.
 
-mytop always passed an explicit password to `DBI->connect()` - `''` (empty string) by default - which overrides whatever the MySQL/MariaDB client library would otherwise auto-load from `[client]` in `~/.my.cnf` (e.g. `/root/.my.cnf`, as cPanel-managed MariaDB installs typically set up). This caused `Access denied for user 'root'@'localhost' (using password: NO)` on any system where root requires a real password, even though it was correctly configured in `.my.cnf`. The default password is now `undef` instead of `''`, so - unless you explicitly set one via `-p`, `--password`, `--prompt`, or `~/.mytop` - mytop now defers to `~/.my.cnf` exactly like the plain `mysql` CLI does when run without `-p`.
+mytop always passed an explicit password to `DBI->connect()` - `''` (empty string) by default - which overrides whatever the MySQL/MariaDB client library would otherwise auto-load from `[client]` in `~/.my.cnf` (e.g. `/root/.my.cnf`, as cPanel-managed MySQL/MariaDB installs typically set up). This caused `Access denied for user 'root'@'localhost' (using password: NO)` on any system where root requires a real password, even though it was correctly configured in `.my.cnf`. The default password is now `undef` instead of `''`, so - unless you explicitly set one via `-p`, `--password`, `--prompt`, or `~/.mytop` - mytop now defers to `~/.my.cnf` exactly like the plain `mysql` CLI does when run without `-p`.
 
-Cleaner header display: load average and server version.
+5. Cleaner header display: load average and server version.
 
 The load average and uptime shown in the header are now labeled and clearly separated, e.g. `Load Avg.: 5.34 (1m) 4.53 (5m) 5.41 (15m) - Uptime: 3+12:55:33`, instead of the old unlabeled `load 5.34 4.53 5.41  11/6259 2580836 up 3+12:55:33 [14:03:22]`, which also dumped the running/total process count and the last PID straight from the raw `/proc/loadavg` line. The current time now gets its own labeled line below (`Current Time: 14:03:22`) instead of being tacked on unlabeled at the end. Additionally, MariaDB's reported version string includes a redundant `-MariaDB` build suffix (e.g. `11.4.12-MariaDB`), which produced a duplicated `MariaDB 11.4.12-MariaDB` title; it's now stripped for display, matching MariaDB's own bundled `mytop`.
 
